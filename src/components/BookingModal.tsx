@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import usePlacesStore from "../store/usePlacesStore";
 import { BookingModalProps } from "../types/types";
+import moment from "moment";
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -57,6 +58,7 @@ const InputWrapper = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
+    font-weight: 600;
 
     @media (min-width: 768px) {
       width: 50%;
@@ -64,8 +66,14 @@ const InputWrapper = styled.div`
   }
 
   input {
+    margin-top: 5px;
     height: 35px;
   }
+`;
+
+const ErrorMessage = styled.p`
+  color: red;
+  margin: 0 0 16px 0;
 `;
 
 const ModalFooter = styled.div`
@@ -99,13 +107,26 @@ const Button = styled.button`
   &.cancel {
     background-color: #7a7a7a;
   }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: var(--primary-color);
+    }
+  }
 `;
 
 const BookingModal = ({ place, onClose }: BookingModalProps) => {
   const currentBooking = usePlacesStore((state) => state.currentBooking);
+  const setCurrentBooking = usePlacesStore((state) => state.setCurrentBooking);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
+  const [error, setError] = useState<string>("");
   const addBooking = usePlacesStore((state) => state.addBooking);
+
+  if (!place) return null;
 
   useEffect(() => {
     if (currentBooking.startDate && currentBooking.endDate) {
@@ -114,14 +135,44 @@ const BookingModal = ({ place, onClose }: BookingModalProps) => {
     }
   }, [currentBooking]);
 
-  const handleSave = () => {
-    if (place) {
-      addBooking(place.id, startDate, endDate);
+  const validateDates = (start: string, end: string) => {
+    const startMoment = moment(start);
+    const endMoment = moment(end);
+
+    if (startMoment.isAfter(endMoment)) {
+      setError("Please select valid dates.");
+      return;
     }
-    onClose();
+
+    const isDateConflict = place.bookings.some((booking) => {
+      const bookingStart = moment(booking.startDate);
+      const bookingEnd = moment(booking.endDate);
+      return (
+        startMoment.isBetween(bookingStart, bookingEnd, null, "[]") ||
+        endMoment.isBetween(bookingStart, bookingEnd, null, "[]") ||
+        bookingStart.isBetween(startMoment, endMoment, null, "[]") ||
+        bookingEnd.isBetween(startMoment, endMoment, null, "[]")
+      );
+    });
+
+    if (isDateConflict) {
+      setError("The selected dates are not available.");
+    } else {
+      setError("");
+    }
   };
 
-  if (!place) return null;
+  const handleSave = () => {
+    if (place && !error) {
+      addBooking(place.id, startDate, endDate);
+      onClose();
+      setCurrentBooking("", "");
+    }
+  };
+
+  useEffect(() => {
+    validateDates(startDate, endDate);
+  }, [startDate, endDate]);
 
   return (
     <ModalOverlay>
@@ -151,12 +202,13 @@ const BookingModal = ({ place, onClose }: BookingModalProps) => {
               />
             </label>
           </InputWrapper>
+          {error && <ErrorMessage>{error}</ErrorMessage>}
         </ModalBody>
         <ModalFooter>
           <Button className="cancel" onClick={onClose}>
             Cancel
           </Button>
-          <Button className="save" onClick={handleSave}>
+          <Button className="save" onClick={handleSave} disabled={!!error}>
             Save
           </Button>
         </ModalFooter>
