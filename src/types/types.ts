@@ -20,6 +20,11 @@ export type PlacesState = {
   currentBooking: { startDate: string; endDate: string };
   setCurrentBooking: (startDate: string, endDate: string) => void;
   getBookingsByUser: (userId: number) => { place: Place; booking: Booking }[];
+  getAvailablePlaces: (
+    city: string,
+    startDate: string,
+    endDate: string
+  ) => Place[];
 };
 
 export type BookingModalProps = {

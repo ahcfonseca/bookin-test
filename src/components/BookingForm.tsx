@@ -85,7 +85,7 @@ const BookingForm = ({ onSearch }: BookingFormProps) => {
   const places = usePlacesStore((state) => state.places);
   const setCurrentBooking = usePlacesStore((state) => state.setCurrentBooking);
 
-  // here we create an array with the cities, removing duplicates
+  // Create an array with the cities, removing duplicates
   const cities = Array.from(new Set(places.map((place) => place.city)));
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -93,7 +93,6 @@ const BookingForm = ({ onSearch }: BookingFormProps) => {
     setCurrentBooking(startDate, endDate);
     onSearch(city, startDate, endDate);
   };
-
   return (
     <Wrapper>
       <Form onSubmit={handleSubmit}>

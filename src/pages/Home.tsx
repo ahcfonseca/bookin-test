@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TabSwitcher from "../components/TabSwitcher";
 import PlacesGrid from "../components/PlacesGrid";
 import BookingForm from "../components/BookingForm";
@@ -9,20 +9,22 @@ import MyBookings from "../components/MyBookings";
 const Home = () => {
   const [filteredPlaces, setFilteredPlaces] = useState<Place[]>([]);
   const places = usePlacesStore((state) => state.places);
+  const getAvailablePlaces = usePlacesStore(
+    (state) => state.getAvailablePlaces
+  );
   const [currentTab, setCurrentTab] = useState("available");
   const [currentCity, setCurrentCity] = useState<string>("");
 
   const handleSearch = (city: string, startDate: string, endDate: string) => {
     setCurrentCity(city);
-    const filtered = places.filter((place) => {
-      const isCityMatch = city ? place.city === city : true;
-      // Further filtering logic based on startDate and endDate can be added here
-      return isCityMatch;
-    });
-    setFilteredPlaces(filtered);
+    const availablePlaces = getAvailablePlaces(city, startDate, endDate); // getting the available places for the choosed date on home page
+    setFilteredPlaces(availablePlaces);
   };
 
-  //TODO: reset filtered results when changing tabs
+  // reseting results after changing tabs
+  useEffect(() => {
+    setFilteredPlaces(places);
+  }, [currentTab]);
 
   return (
     <>

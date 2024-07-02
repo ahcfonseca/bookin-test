@@ -1,6 +1,8 @@
 import create from "zustand";
+import moment from "moment";
 import { PlacesState } from "../types/types";
 
+// not the best approach, but for the test we save the places and it's bookings here
 const usePlacesStore = create<PlacesState>((set, get) => ({
   places: [
     {
@@ -173,6 +175,27 @@ const usePlacesStore = create<PlacesState>((set, get) => ({
         .filter((booking) => booking.userId === userId)
         .map((booking) => ({ place, booking }))
     );
+  },
+
+  getAvailablePlaces: (city, startDate, endDate) => {
+    const start = moment(startDate);
+    const end = moment(endDate);
+
+    return get().places.filter((place) => {
+      if (city && place.city !== city) return false;
+
+      return !place.bookings.some((booking) => {
+        const bookingStart = moment(booking.startDate);
+        const bookingEnd = moment(booking.endDate);
+
+        return (
+          (bookingStart.isSameOrBefore(start) &&
+            bookingEnd.isSameOrAfter(start)) ||
+          (bookingStart.isSameOrBefore(end) && bookingEnd.isSameOrAfter(end)) ||
+          (bookingStart.isAfter(start) && bookingEnd.isBefore(end))
+        );
+      });
+    });
   },
 }));
 
