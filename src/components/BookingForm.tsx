@@ -90,7 +90,7 @@ const BookingForm = ({ onSearch }: BookingFormProps) => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setCurrentBooking(startDate, endDate);
+    setCurrentBooking(undefined, startDate, endDate);
     onSearch(city, startDate, endDate);
   };
   return (

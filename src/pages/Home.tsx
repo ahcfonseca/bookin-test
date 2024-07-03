@@ -24,6 +24,7 @@ const Home = () => {
   // reseting results after changing tabs
   useEffect(() => {
     setFilteredPlaces(places);
+    setCurrentCity("");
   }, [currentTab]);
 
   return (

@@ -151,17 +151,55 @@ const usePlacesStore = create<PlacesState>((set, get) => ({
     },
   ],
 
-  currentBooking: { startDate: "", endDate: "" },
-  setCurrentBooking: (startDate, endDate) =>
-    set({ currentBooking: { startDate, endDate } }),
+  currentBooking: { id: undefined, startDate: "", endDate: "" },
+  setCurrentBooking: (id, startDate, endDate) =>
+    set({ currentBooking: { id, startDate, endDate } }),
 
   addBooking: (placeId, startDate, endDate) => {
+    set((state) => {
+      const timestamp = Date.now();
+      const updatedPlaces = state.places.map((place) =>
+        place.id === placeId
+          ? {
+              ...place,
+              bookings: [
+                ...place.bookings,
+                { id: timestamp, userId: 1, startDate, endDate },
+              ],
+            }
+          : place
+      );
+      return { places: updatedPlaces };
+    });
+  },
+
+  updateBooking: (placeId, bookingId, startDate, endDate) => {
     set((state) => {
       const updatedPlaces = state.places.map((place) =>
         place.id === placeId
           ? {
               ...place,
-              bookings: [...place.bookings, { userId: 1, startDate, endDate }],
+              bookings: place.bookings.map((booking) =>
+                booking.id === bookingId
+                  ? { ...booking, startDate, endDate }
+                  : booking
+              ),
+            }
+          : place
+      );
+      return { places: updatedPlaces };
+    });
+  },
+
+  deleteBooking: (placeId, bookingId) => {
+    set((state) => {
+      const updatedPlaces = state.places.map((place) =>
+        place.id === placeId
+          ? {
+              ...place,
+              bookings: place.bookings.filter(
+                (booking) => booking.id !== bookingId
+              ),
             }
           : place
       );

@@ -118,22 +118,32 @@ const Button = styled.button`
   }
 `;
 
-const BookingModal = ({ place, onClose }: BookingModalProps) => {
+const BookingModal = ({ place, booking, onClose }: BookingModalProps) => {
   const currentBooking = usePlacesStore((state) => state.currentBooking);
   const setCurrentBooking = usePlacesStore((state) => state.setCurrentBooking);
+  const addBooking = usePlacesStore((state) => state.addBooking);
+  const updateBooking = usePlacesStore((state) => state.updateBooking);
+
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const addBooking = usePlacesStore((state) => state.addBooking);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
-  if (!place) return null;
+  if (!place) {
+    return;
+  }
 
   useEffect(() => {
-    if (currentBooking.startDate && currentBooking.endDate) {
+    if (booking) {
+      setStartDate(booking.startDate);
+      setEndDate(booking.endDate);
+      setIsUpdating(true);
+    } else if (currentBooking.startDate && currentBooking.endDate) {
       setStartDate(currentBooking.startDate);
       setEndDate(currentBooking.endDate);
+      setIsUpdating(false);
     }
-  }, [currentBooking]);
+  }, [booking, currentBooking]);
 
   const validateDates = (start: string, end: string) => {
     const startMoment = moment(start);
@@ -144,9 +154,15 @@ const BookingModal = ({ place, onClose }: BookingModalProps) => {
       return;
     }
 
-    const isDateConflict = place.bookings.some((booking) => {
-      const bookingStart = moment(booking.startDate);
-      const bookingEnd = moment(booking.endDate);
+    const isDateConflict = place.bookings.some((b) => {
+      const bookingStart = moment(b.startDate);
+      const bookingEnd = moment(b.endDate);
+
+      // If it's an update we skip the current booking
+      if (isUpdating && b.id === booking?.id) {
+        return false;
+      }
+
       return (
         startMoment.isBetween(bookingStart, bookingEnd, null, "[]") ||
         endMoment.isBetween(bookingStart, bookingEnd, null, "[]") ||
@@ -164,9 +180,13 @@ const BookingModal = ({ place, onClose }: BookingModalProps) => {
 
   const handleSave = () => {
     if (place && !error) {
-      addBooking(place.id, startDate, endDate);
+      if (booking) {
+        updateBooking(place.id, booking.id, startDate, endDate);
+      } else {
+        addBooking(place.id, startDate, endDate);
+      }
       onClose();
-      setCurrentBooking("", "");
+      setCurrentBooking(undefined, "", "");
     }
   };
 
@@ -183,7 +203,6 @@ const BookingModal = ({ place, onClose }: BookingModalProps) => {
         </ModalHeader>
         <ModalBody>
           <p>{place.city}</p>
-          <p>{place.name}</p>
           <InputWrapper>
             <label>
               Check In:
