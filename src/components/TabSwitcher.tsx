@@ -46,7 +46,7 @@ type TabSwitcherProps = {
 };
 
 const TabSwitcher = ({ onChangeTab }: TabSwitcherProps) => {
-  const [activeTab, setActiveTab] = useState("available");
+  const [activeTab, setActiveTab] = useState<string>("available");
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);

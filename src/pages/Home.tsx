@@ -12,7 +12,7 @@ const Home = () => {
   const getAvailablePlaces = usePlacesStore(
     (state) => state.getAvailablePlaces
   );
-  const [currentTab, setCurrentTab] = useState("available");
+  const [currentTab, setCurrentTab] = useState<string>("available");
   const [currentCity, setCurrentCity] = useState<string>("");
 
   const handleSearch = (city: string, startDate: string, endDate: string) => {
