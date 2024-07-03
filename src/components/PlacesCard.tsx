@@ -1,7 +1,11 @@
 import { useState } from "react";
 import styled from "styled-components";
 import BookingModal from "./BookingModal";
-import { PlacesCardProps } from "../types/types";
+import { Place } from "../types/types";
+
+export type PlacesCardProps = {
+  place: Place;
+};
 
 const Card = styled.div`
   border: 1px solid #ccc;

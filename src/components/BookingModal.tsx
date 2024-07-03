@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import usePlacesStore from "../store/usePlacesStore";
-import { BookingModalProps } from "../types/types";
+import { Booking, Place } from "../types/types";
 import moment from "moment";
+
+type BookingModalProps = {
+  booking?: Booking | null;
+  place: Place | null;
+  onClose: () => void;
+};
 
 const ModalOverlay = styled.div`
   position: fixed;

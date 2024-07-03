@@ -1,6 +1,11 @@
-import { PlacesGridProps } from "../types/types";
+import { Place } from "../types/types";
 import PlacesCard from "./PlacesCard";
 import styled from "styled-components";
+
+export type PlacesGridProps = {
+  places: Place[];
+  currentCity: string;
+};
 
 const GridWrapper = styled.div`
   display: grid;

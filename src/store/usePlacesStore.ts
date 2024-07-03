@@ -1,6 +1,30 @@
 import create from "zustand";
 import moment from "moment";
-import { PlacesState } from "../types/types";
+import { Place, Booking } from "../types/types";
+
+type PlacesState = {
+  places: Place[];
+  addBooking: (placeId: number, startDate: string, endDate: string) => void;
+  updateBooking: (
+    placeId: number,
+    bookingId: number,
+    startDate: string,
+    endDate: string
+  ) => void;
+  deleteBooking: (placeId: number, bookingId: number) => void;
+  currentBooking: { id?: number; startDate: string; endDate: string };
+  setCurrentBooking: (
+    id: number | undefined,
+    startDate: string,
+    endDate: string
+  ) => void;
+  getBookingsByUser: (userId: number) => { place: Place; booking: Booking }[];
+  getAvailablePlaces: (
+    city: string,
+    startDate: string,
+    endDate: string
+  ) => Place[];
+};
 
 // not the best approach, but for the test we save the places and it's bookings here
 const usePlacesStore = create<PlacesState>((set, get) => ({
