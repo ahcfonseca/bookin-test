@@ -40,6 +40,7 @@ const Image = styled.img`
   height: auto;
   object-fit: cover;
   border-radius: 4px;
+  aspect-ratio: 4/3;
 
   @media (min-width: 540px) {
     width: 30%;
