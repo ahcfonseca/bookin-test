@@ -6,6 +6,8 @@ git clone https://github.com/ahcfonseca/bookin-test
 
 cd booking-test
 
+
+
 2- Install dependencies:
 
 npm install
@@ -13,6 +15,8 @@ npm install
 or
 
 yarn install
+
+
 
 3- Start the development server:
 
@@ -23,6 +27,8 @@ or
 yarn dev
 
 This will launch the Vite development server, and you can access your app at http://localhost:5173.
+
+
 
 4- Build for production:
 
